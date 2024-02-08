@@ -5,8 +5,16 @@
         <link>http://example.com</link>
         <description></description>
         <language>en</language>
-        <pubDate>Thu, 08 Feb 2024 12:40:52 +0800</pubDate>
-        <lastBuildDate>Thu, 08 Feb 2024 12:40:52 +0800</lastBuildDate>
+        <pubDate>Thu, 08 Feb 2024 19:18:26 +0800</pubDate>
+        <lastBuildDate>Thu, 08 Feb 2024 19:18:26 +0800</lastBuildDate>
+        <item>
+            <guid isPermalink="true">http://example.com/2024/02/08/hello_blog/</guid>
+            <title>Hello Blog</title>
+            <link>http://example.com/2024/02/08/hello_blog/</link>
+            <pubDate>Thu, 08 Feb 2024 19:18:26 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;&lt;strong&gt;也算是有了一个自己的blog吧&lt;/strong&gt;&lt;/p&gt;
+ ]]></description>
+        </item>
         <item>
             <guid isPermalink="true">http://example.com/2024/02/08/hello-world/</guid>
             <title>Hello World</title>
