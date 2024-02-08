@@ -5,7 +5,7 @@
 # Site
 title: 5hizuku's home
 subtitle: ''
-description: '我也想成为大黑阔'
+description: ''
 keywords:
 author: 5hizuku
 language: en
@@ -13,7 +13,7 @@ timezone: ''
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: https://space.bilibili.com/229087700
+url: http://example.com
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -101,4 +101,6 @@ theme: hexo-theme-particlex
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: https://github.com/justkeepitinmind/justkeepitinmind.github.io.git
+  branch: main
