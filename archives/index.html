@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Archives | 5hizuku&#39;s home</title>
-    <meta name="author" content="5hizuku" />
+    <title>Archives | shizuku&#39;s home</title>
+    <meta name="author" content="shizuku" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
@@ -29,6 +29,11 @@
 <script src="/js/lib/highlight.js"></script>
 
 
+<script src="https://cdn.staticfile.org/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdn.staticfile.org/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="https://cdn.staticfile.org/KaTeX/0.16.9/katex.min.css" />
+<script src="/js/lib/math.js"></script>
+
 
 <script src="/js/lib/preview.js"></script>
 
@@ -38,7 +43,7 @@
 
 <link rel="stylesheet" href="/css/main.css" />
 
-<meta name="generator" content="Hexo 7.1.1"><link rel="alternate" href="/atom.xml" title="5hizuku's home" type="application/atom+xml">
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="shizuku's home" type="application/atom+xml">
 </head>
 <body>
     <div id="layout">
@@ -54,17 +59,12 @@
         <div id="menu" :class="{ hidden: hiddenMenu, 'menu-color': menuColor}">
     <nav id="desktop-menu">
         <a class="title" href="/">
-            <span>5HIZUKU&#39;S HOME</span>
+            <span>SHIZUKU&#39;S HOME</span>
         </a>
         
         <a href="/">
             <i class="fa-solid fa-house fa-fw"></i>
             <span>&ensp;Home</span>
-        </a>
-        
-        <a href="/about">
-            <i class="fa-solid fa-id-card fa-fw"></i>
-            <span>&ensp;About</span>
         </a>
         
         <a href="/archives">
@@ -82,8 +82,8 @@
             <span>&ensp;Tags</span>
         </a>
         
-        <a href="/friend%20links">
-            <i class="fa-solid fa-friend links fa-fw"></i>
+        <a href="/friendLinks">
+            <i class="fa-solid fa-link fa-fw"></i>
             <span>&ensp;Friend Links</span>
         </a>
         
@@ -91,7 +91,7 @@
     <nav id="mobile-menu">
         <div class="title" @click="showMenuItems = !showMenuItems">
             <i class="fa-solid fa-bars fa-fw"></i>
-            <span>&emsp;5HIZUKU&#39;S HOME</span>
+            <span>&emsp;SHIZUKU&#39;S HOME</span>
         </div>
         <transition name="slide">
             <div class="items" v-show="showMenuItems">
@@ -102,15 +102,6 @@
                             <i class="fa-solid fa-house fa-fw"></i>
                         </div>
                         <div style="min-width: 100px; max-width: 150%; width: 20%">Home</div>
-                    </div>
-                </a>
-                
-                <a href="/about">
-                    <div class="item">
-                        <div style="min-width: 20px; max-width: 50px; width: 10%">
-                            <i class="fa-solid fa-id-card fa-fw"></i>
-                        </div>
-                        <div style="min-width: 100px; max-width: 150%; width: 20%">About</div>
                     </div>
                 </a>
                 
@@ -141,10 +132,10 @@
                     </div>
                 </a>
                 
-                <a href="/friend%20links">
+                <a href="/friendLinks">
                     <div class="item">
                         <div style="min-width: 20px; max-width: 50px; width: 10%">
-                            <i class="fa-solid fa-friend links fa-fw"></i>
+                            <i class="fa-solid fa-link fa-fw"></i>
                         </div>
                         <div style="min-width: 100px; max-width: 150%; width: 20%">Friend Links</div>
                     </div>
@@ -164,20 +155,6 @@
     
     <div id="timeline-wrap" ref="timeline">
         
-        <div class="timeline" data-title="helloworld">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2024/2/8</div>
-                <a href="/2024/02/08/hello-world/">
-                    <h3>Hello World</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                </div>
-            </div>
-        </div>
-        
         <div class="timeline" data-title="helloblog">
             <div class="timeline-tail"></div>
             <div class="timeline-content">
@@ -186,6 +163,42 @@
                     <h3>Hello Blog</h3>
                 </a>
                 <div class="info">
+                    
+                    
+                    <span class="tags">
+                        <span class="icon">
+                            <i class="fa-solid fa-tags fa-fw"></i>
+                        </span>
+                        
+                        
+                        <span class="tag">
+                            
+                            <a href="/tags/diary/" style="color: #ff7d73">diary</a>
+                        </span>
+                        
+                    </span>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="timeline" data-title="n1junoirwriteup">
+            <div class="timeline-tail"></div>
+            <div class="timeline-content">
+                <div class="item-time">2024/2/10</div>
+                <a href="/2024/02/10/n1junoir/">
+                    <h3>n1junoir write up</h3>
+                </a>
+                <div class="info">
+                    
+                    <span class="category">
+                        <a href="/categories/crypto/">
+                            <span class="icon">
+                                <i class="fa-solid fa-bookmark fa-fw"></i>
+                            </span>
+                            crypto
+                        </a>
+                    </span>
                     
                     
                 </div>
@@ -199,11 +212,11 @@
     <div id="footer-wrap">
         <div>
             &copy;
-            2022 - 2024 5hizuku&#39;s home
+            2022 - 2024 shizuku&#39;s home
             <span id="footer-icon">
                 <i class="fa-solid fa-font-awesome fa-fw"></i>
             </span>
-            &commat;5hizuku
+            &commat;shizuku
         </div>
         <div>
             Based on the <a target="_blank" rel="noopener" href="https://hexo.io">Hexo Engine</a> &amp;

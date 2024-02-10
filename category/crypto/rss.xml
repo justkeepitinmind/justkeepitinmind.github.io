@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <rss version="2.0">
     <channel>
-        <title>shizuku&#39;s home</title>
+        <title>shizuku&#39;s home • Posts by &#34;crypto&#34; category</title>
         <link>http://example.com</link>
         <description></description>
         <language>en</language>
@@ -344,15 +344,6 @@ input_str = &lt;span class=&#34;string&#34;&gt;f&amp;quot;&lt;span class=&#34;su
 &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(input_str)&lt;/code&gt;&lt;/pre&gt;
 
 
- ]]></description>
-        </item>
-        <item>
-            <guid isPermalink="true">http://example.com/2024/02/08/hello_blog/</guid>
-            <title>Hello Blog</title>
-            <link>http://example.com/2024/02/08/hello_blog/</link>
-            <category>diary</category>
-            <pubDate>Thu, 08 Feb 2024 19:35:24 +0800</pubDate>
-            <description><![CDATA[ &lt;p&gt;&lt;strong&gt;也算是有了一个自己的blog吧&lt;/strong&gt;&lt;/p&gt;
  ]]></description>
         </item>
     </channel>
