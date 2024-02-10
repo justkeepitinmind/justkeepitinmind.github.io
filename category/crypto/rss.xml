@@ -13,7 +13,8 @@
             <title>n1junoir write up</title>
             <link>http://example.com/2024/02/10/n1junoir/</link>
             <pubDate>Sat, 10 Feb 2024 11:39:08 +0800</pubDate>
-            <description><![CDATA[ &lt;h2 id=&#34;all&#34;&gt;&lt;a href=&#34;#all&#34; class=&#34;headerlink&#34; title=&#34;all&#34;&gt;&lt;/a&gt;all&lt;/h2&gt;&lt;p&gt;something to say&lt;/p&gt;
+            <description><![CDATA[ &lt;h2 id=&#34;introduction&#34;&gt;&lt;a href=&#34;#introduction&#34; class=&#34;headerlink&#34; title=&#34;introduction&#34;&gt;&lt;/a&gt;introduction&lt;/h2&gt;&lt;p&gt;n1 junior crypto方向总的来说题是不难，有新意。本人也有幸拿下两个一血。&lt;/p&gt;
+&lt;p&gt;这篇文章是我的第一篇wp，也是发在博客上的第一篇文章，就当练练手吧&lt;/p&gt;
 &lt;span id=&#34;more&#34;&gt;&lt;/span&gt;
 &lt;h2 id=&#34;cc&#34;&gt;&lt;a href=&#34;#cc&#34; class=&#34;headerlink&#34; title=&#34;cc@&#34;&gt;&lt;/a&gt;cc@&lt;/h2&gt;&lt;p&gt;首先经过观察可以知道这个GCM是很安全的，因为他每一次都会换nonce，所以即使你知道了GCM的key也是没又说明用的。但是他的每次GCM加密前没有进行pad,那我们就可以根据GCM返回的位数来推断原数的大小&lt;/p&gt;
 &lt;p&gt;然后我们稍微了解一下ElGamal,知道他最后会产生一个私钥$x$,每次加密的时候会产生两个数$c_1,c_2$,满足对于传入的消息$m$，有$m &amp;#x3D; c_1^{-x}c_2$&lt;br&gt;我们$query(c_1, c_2)$ (或者说是oracle) 会返回$m$经过GCM解密的值,我们发现他是21bytes大小的，而理论上随机传进去两个数字的大小应该和模数p是一个量级的（64bytes）。这就给了我们可以攻击的角度。&lt;/p&gt;
