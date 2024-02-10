@@ -7,7 +7,6 @@
         <language>en</language>
         <pubDate>Sat, 10 Feb 2024 11:39:08 +0800</pubDate>
         <lastBuildDate>Sat, 10 Feb 2024 11:39:08 +0800</lastBuildDate>
-        <category>diary</category>
         <item>
             <guid isPermalink="true">http://example.com/2024/02/10/n1junoir/</guid>
             <title>n1junoir write up</title>
@@ -21,53 +20,53 @@
 &lt;p&gt;我们可以$query(c_1,i * c_2)$,此时ElGamal返回的是i * m的值，注意因为m较小，返回的值我们可以当作是没有进行取模的原本的值。&lt;/p&gt;
 &lt;p&gt;假如我们能找到一个 $i$ 使得，query(c1,i * c2)返回是byte数是$k$ , 而query(c1, (i + 1) * c2)返回的byte数是$k+1$,那就说明$m * i &amp;lt; 256^{k+1} &amp;lt; m * (i+1) $, 然后这样我们就可以得到m的准确值了。&lt;/p&gt;
 &lt;p&gt;求解这个 $i$ 的话，我们可以先随便泡泡找到他的一个上界和一个下界，然后用二分的方法得到（然后其实虽然我们query只有100次机会，但其实每一次flag都不会变，100次用完了我们重新连接进行交互就行）&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;&lt;span class=&#34;keyword&#34;&gt;from&lt;/span&gt; pwn &lt;span class=&#34;keyword&#34;&gt;import&lt;/span&gt; *
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;from pwn import *
 
-IP, PORT = &lt;span class=&#34;string&#34;&gt;&amp;quot;101.34.72.206 1338&amp;quot;&lt;/span&gt;.split()
-
-
-&lt;span class=&#34;comment&#34;&gt;# return c1, c2, p&lt;/span&gt;
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;gift&lt;/span&gt;() -&amp;gt; (&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;, &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;, &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;):
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;&amp;gt; &amp;quot;&lt;/span&gt;)
-    conn.sendline(&lt;span class=&#34;string&#34;&gt;b&amp;quot;g&amp;quot;&lt;/span&gt;)
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;c = [&amp;quot;&lt;/span&gt;)
-    c1, c2 = &lt;span class=&#34;built_in&#34;&gt;map&lt;/span&gt;(&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;, conn.recvline().decode().strip()[:-&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;].split(&lt;span class=&#34;string&#34;&gt;&amp;quot;,&amp;quot;&lt;/span&gt;))
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;p = &amp;quot;&lt;/span&gt;)
-
-    p = &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(conn.recvline().decode().strip())
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; c1, c2, p
+IP, PORT = &amp;quot;101.34.72.206 1338&amp;quot;.split()
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;query&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;x: &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;, y: &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;&lt;/span&gt;) -&amp;gt; &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;:
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;&amp;gt; &amp;quot;&lt;/span&gt;)
-    conn.sendline(&lt;span class=&#34;string&#34;&gt;b&amp;quot;o&amp;quot;&lt;/span&gt;)
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;data: &amp;quot;&lt;/span&gt;)
-    conn.sendline(&lt;span class=&#34;string&#34;&gt;f&amp;quot;&lt;span class=&#34;subst&#34;&gt;&amp;#123;x&amp;#125;&lt;/span&gt;,&lt;span class=&#34;subst&#34;&gt;&amp;#123;y&amp;#125;&lt;/span&gt;&amp;quot;&lt;/span&gt;.encode())
-    conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;[+] &amp;quot;&lt;/span&gt;)
+# return c1, c2, p
+def gift() -&amp;gt; (int, int, int):
+    conn.recvuntil(b&amp;quot;&amp;gt; &amp;quot;)
+    conn.sendline(b&amp;quot;g&amp;quot;)
+    conn.recvuntil(b&amp;quot;c = [&amp;quot;)
+    c1, c2 = map(int, conn.recvline().decode().strip()[:-1].split(&amp;quot;,&amp;quot;))
+    conn.recvuntil(b&amp;quot;p = &amp;quot;)
+
+    p = int(conn.recvline().decode().strip())
+    return c1, c2, p
+
+
+def query(x: int, y: int) -&amp;gt; bytes:
+    conn.recvuntil(b&amp;quot;&amp;gt; &amp;quot;)
+    conn.sendline(b&amp;quot;o&amp;quot;)
+    conn.recvuntil(b&amp;quot;data: &amp;quot;)
+    conn.sendline(f&amp;quot;&amp;#123;x&amp;#125;,&amp;#123;y&amp;#125;&amp;quot;.encode())
+    conn.recvuntil(b&amp;quot;[+] &amp;quot;)
     recv_text = conn.recvline().decode().strip()
-    &lt;span class=&#34;comment&#34;&gt;# print(recv_text)&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;.fromhex(recv_text)
+    # print(recv_text)
+    return bytes.fromhex(recv_text)
 
 
 conn = remote(IP, PORT)
-L = &lt;span class=&#34;number&#34;&gt;3000000000000000000000000000000000000000000000000000000000000&lt;/span&gt; 
-R = &lt;span class=&#34;number&#34;&gt;5000000000000000000000000000000000000000000000000000000000000&lt;/span&gt;  
+L = 3000000000000000000000000000000000000000000000000000000000000 
+R = 5000000000000000000000000000000000000000000000000000000000000  
 c1, c2, p = gift()
-&lt;span class=&#34;keyword&#34;&gt;while&lt;/span&gt; L != R:
-    mid = (L + R) // &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(query(c1, mid * c2)) == &lt;span class=&#34;number&#34;&gt;46&lt;/span&gt;:
-        L = mid + &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt;:
+while L != R:
+    mid = (L + R) // 2
+    if len(query(c1, mid * c2)) == 46:
+        L = mid + 1
+    else:
         R = mid
-    &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(L, R)
+    print(L, R)
 
-&lt;span class=&#34;comment&#34;&gt;# L = 3939199615952307623545814154896359932381494589341879343811020&lt;/span&gt;
-m = &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(&lt;span class=&#34;string&#34;&gt;&amp;quot;1&amp;quot;&lt;/span&gt; + &lt;span class=&#34;string&#34;&gt;&amp;quot;0&amp;quot;&lt;/span&gt; * &lt;span class=&#34;number&#34;&gt;92&lt;/span&gt;, &lt;span class=&#34;number&#34;&gt;16&lt;/span&gt;) // L + &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-
+# L = 3939199615952307623545814154896359932381494589341879343811020
+m = int(&amp;quot;1&amp;quot; + &amp;quot;0&amp;quot; * 92, 16) // L + 1
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;iev-l&#34;&gt;&lt;a href=&#34;#iev-l&#34; class=&#34;headerlink&#34; title=&#34;iev@l&#34;&gt;&lt;/a&gt;iev@l&lt;/h2&gt;&lt;p&gt;因为不会python jail而没做出来&lt;/p&gt;
 &lt;p&gt;谈谈思路，因为提示是meet in the middle，然后就想着类似于bsgs那样的枚举。接着我们要想想怎么反着走，根据&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight plaintext&#34;&gt;if last: j.remove(last)&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;if last: j.remove(last)
+&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;然后再观察一下code的ihash过程中j_invariant和j数组的变化，我们可以猜测反着走和正着走其实类似。&lt;/p&gt;
 &lt;p&gt;然后我们就可以开始写meet in the middle 搜索函数了，参考下面的search函数。&lt;/p&gt;
 &lt;p&gt;搜索过程类似于下图&lt;/p&gt;
@@ -80,76 +79,77 @@ m = &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(&lt;span class=&#34;st
 &lt;p&gt;然后打算是system(“…..”)……print(‘Welcome….’)然后发现这样根本运行不了直接报错&lt;/p&gt;
 &lt;p&gt;然后突然想到一些杂七杂八的符号可以加进指令里面，也就是system(‘cat \FLAG ***********’) 借用print(‘……’) 后两个符号。&lt;/p&gt;
 &lt;p&gt;对应到上图也就是&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;a = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;system(&amp;#x27;cat \FLAG &amp;quot;&lt;/span&gt;)
-b = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;print(&amp;#x27;Welcome 2 n1junior&amp;quot;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;a = ihash(b&amp;quot;system(&amp;#39;cat \FLAG &amp;quot;)
+b = ihash(b&amp;quot;print(&amp;#39;Welcome 2 n1junior&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;，其实到这儿已经和答案很近了，只要百度搜一下python jail就能得到正确的注入方式。改成&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;a = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;cat /FLAG &amp;quot;&lt;/span&gt;)
-b = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;print(&amp;#x27;Welcome 2 n1junior&amp;quot;&lt;/span&gt;)&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;a = ihash(b&amp;quot;__import__(&amp;#39;os&amp;#39;).system(&amp;#39;cat /FLAG &amp;quot;)
+b = ihash(b&amp;quot;print(&amp;#39;Welcome 2 n1junior&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;然后就能过了。&lt;/p&gt;
 &lt;p&gt;下面是完整的代码&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;&lt;span class=&#34;keyword&#34;&gt;from&lt;/span&gt; queue &lt;span class=&#34;keyword&#34;&gt;import&lt;/span&gt; Queue
-&lt;span class=&#34;keyword&#34;&gt;from&lt;/span&gt; Crypto.Util.number &lt;span class=&#34;keyword&#34;&gt;import&lt;/span&gt; *
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;from queue import Queue
+from Crypto.Util.number import *
 
-p = &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; ^ &lt;span class=&#34;number&#34;&gt;12&lt;/span&gt; * &lt;span class=&#34;number&#34;&gt;3&lt;/span&gt; ^ &lt;span class=&#34;number&#34;&gt;13&lt;/span&gt; - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;
-F = GF(p ^ &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;, modulus=x ^ &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; + &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;, name=&lt;span class=&#34;string&#34;&gt;&amp;quot;i&amp;quot;&lt;/span&gt;)
+p = 2 ^ 12 * 3 ^ 13 - 1
+F = GF(p ^ 2, modulus=x ^ 2 + 1, name=&amp;quot;i&amp;quot;)
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;ihash&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;m: &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;&lt;/span&gt;):
-    p = &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; ^ &lt;span class=&#34;number&#34;&gt;12&lt;/span&gt; * &lt;span class=&#34;number&#34;&gt;3&lt;/span&gt; ^ &lt;span class=&#34;number&#34;&gt;13&lt;/span&gt; - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;
-    F = GF(p ^ &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;, modulus=x ^ &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; + &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;, name=&lt;span class=&#34;string&#34;&gt;&amp;quot;i&amp;quot;&lt;/span&gt;)
-    E_now = EllipticCurve(j=F(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;))
-    bits = &lt;span class=&#34;built_in&#34;&gt;bin&lt;/span&gt;(&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(m.&lt;span class=&#34;built_in&#34;&gt;hex&lt;/span&gt;(), &lt;span class=&#34;number&#34;&gt;16&lt;/span&gt;))[&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;:].zfill(&lt;span class=&#34;number&#34;&gt;8&lt;/span&gt; * &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(m))
-    last = &lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; _ &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; bits:
-        ker = E_now(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;).division_points(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:]
-        j = [E_now.isogeny(k).codomain().j_invariant() &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; k &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; ker]
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; last:
+def ihash(m: bytes):
+    p = 2 ^ 12 * 3 ^ 13 - 1
+    F = GF(p ^ 2, modulus=x ^ 2 + 1, name=&amp;quot;i&amp;quot;)
+    E_now = EllipticCurve(j=F(0))
+    bits = bin(int(m.hex(), 16))[2:].zfill(8 * len(m))
+    last = None
+    for _ in bits:
+        ker = E_now(0).division_points(2)[1:]
+        j = [E_now.isogeny(k).codomain().j_invariant() for k in ker]
+        if last:
             j.remove(last)
-        &lt;span class=&#34;comment&#34;&gt;# print(E_now.j_invariant(), j)&lt;/span&gt;
-        E_next = EllipticCurve(j=j[&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(_)])
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; E_next.j_invariant() == E_now.j_invariant():
-            &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(&lt;span class=&#34;string&#34;&gt;&amp;quot;Error Ring, Bad message!&amp;quot;&lt;/span&gt;)
-            &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;
+        # print(E_now.j_invariant(), j)
+        E_next = EllipticCurve(j=j[int(_)])
+        if E_next.j_invariant() == E_now.j_invariant():
+            print(&amp;quot;Error Ring, Bad message!&amp;quot;)
+            return None
         last = E_now.j_invariant()
         E_now = E_next
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; E_now.j_invariant(), last
+    return E_now.j_invariant(), last
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;bytes_to_bits&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;m&lt;/span&gt;):
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;bin&lt;/span&gt;(&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(m.&lt;span class=&#34;built_in&#34;&gt;hex&lt;/span&gt;(), &lt;span class=&#34;number&#34;&gt;16&lt;/span&gt;))[&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;:].zfill(&lt;span class=&#34;number&#34;&gt;8&lt;/span&gt; * &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(m))
+def bytes_to_bits(m):
+    return bin(int(m.hex(), 16))[2:].zfill(8 * len(m))
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;hash_step&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;j: F, s: &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;, last=&lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;&lt;/span&gt;):
+def hash_step(j: F, s: str, last=None):
     E_now = EllipticCurve(j=F(j))
-    ker = E_now(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;).division_points(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:]
-    j = [E_now.isogeny(k).codomain().j_invariant() &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; k &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; ker]
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; last:
+    ker = E_now(0).division_points(2)[1:]
+    j = [E_now.isogeny(k).codomain().j_invariant() for k in ker]
+    if last:
         j.remove(last)
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; j[&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(s)]
+    return j[int(s)]
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;ihash_bits&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;bits: &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;, track=&lt;span class=&#34;literal&#34;&gt;False&lt;/span&gt;&lt;/span&gt;):
+def ihash_bits(bits: str, track=False):
 
-    E_now = EllipticCurve(j=F(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;))
-    last = &lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; _ &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; bits:
-        ker = E_now(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;).division_points(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:]
-        j = [E_now.isogeny(k).codomain().j_invariant() &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; k &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; ker]
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; last:
+    E_now = EllipticCurve(j=F(0))
+    last = None
+    for _ in bits:
+        ker = E_now(0).division_points(2)[1:]
+        j = [E_now.isogeny(k).codomain().j_invariant() for k in ker]
+        if last:
             j.remove(last)
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; track:
-            &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(E_now.j_invariant(), j)
-        E_next = EllipticCurve(j=j[&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(_)])
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; E_next.j_invariant() == E_now.j_invariant():
-            &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(&lt;span class=&#34;string&#34;&gt;&amp;quot;Error Ring, Bad message!&amp;quot;&lt;/span&gt;)
-            &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;
+        if track:
+            print(E_now.j_invariant(), j)
+        E_next = EllipticCurve(j=j[int(_)])
+        if E_next.j_invariant() == E_now.j_invariant():
+            print(&amp;quot;Error Ring, Bad message!&amp;quot;)
+            return None
         last = E_now.j_invariant()
         E_now = E_next
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; E_now.j_invariant(), last
+    return E_now.j_invariant(), last
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;search&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;hash_i: F, hash_j: F, l1=&lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;, l2=&lt;span class=&#34;literal&#34;&gt;None&lt;/span&gt;&lt;/span&gt;):
+def search(hash_i: F, hash_j: F, l1=None, l2=None):
     dic1 = &amp;#123;&amp;#125;
     dic2 = &amp;#123;&amp;#125;
     last1 = &amp;#123;&amp;#125;
@@ -157,119 +157,120 @@ F = GF(p ^ &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;, modulus=x ^ &lt;sp
 
     E1 = EllipticCurve(j=F(hash_i))
     E2 = EllipticCurve(j=F(hash_j))
-    dic1[hash_i] = &lt;span class=&#34;string&#34;&gt;&amp;quot;&amp;quot;&lt;/span&gt;
-    dic2[hash_j] = &lt;span class=&#34;string&#34;&gt;&amp;quot;&amp;quot;&lt;/span&gt;
+    dic1[hash_i] = &amp;quot;&amp;quot;
+    dic2[hash_j] = &amp;quot;&amp;quot;
     last1[hash_i] = l1
     last2[hash_j] = l2
 
     now1, now2 = F(hash_i), F(hash_j)
-    dic1[l1] = &lt;span class=&#34;string&#34;&gt;&amp;quot;-1&amp;quot;&lt;/span&gt;
-    dic2[l2] = &lt;span class=&#34;string&#34;&gt;&amp;quot;-1&amp;quot;&lt;/span&gt;
+    dic1[l1] = &amp;quot;-1&amp;quot;
+    dic2[l2] = &amp;quot;-1&amp;quot;
     q1 = Queue()
     q2 = Queue()
-    &lt;span class=&#34;keyword&#34;&gt;while&lt;/span&gt; &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:
+    while 1:
 
-        ker = E1(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;).division_points(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:]
-        j = [E1.isogeny(k).codomain().j_invariant() &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; k &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; ker]
-        &lt;span class=&#34;comment&#34;&gt;# print(j)&lt;/span&gt;
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; last1[now1]:
+        ker = E1(0).division_points(2)[1:]
+        j = [E1.isogeny(k).codomain().j_invariant() for k in ker]
+        # print(j)
+        if last1[now1]:
             j.remove(last1[now1])
-        &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;range&lt;/span&gt;(&lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(j)):
-            &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(dic1[now1]) % &lt;span class=&#34;number&#34;&gt;8&lt;/span&gt; == &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;and&lt;/span&gt; i == &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:
-                &lt;span class=&#34;keyword&#34;&gt;continue&lt;/span&gt;
-            &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; j[i] &lt;span class=&#34;keyword&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; dic1:
-                dic1[j[i]] = dic1[now1] + &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;(i)
+        for i in range(len(j)):
+            if len(dic1[now1]) % 8 == 0 and i == 1:
+                continue
+            if j[i] not in dic1:
+                dic1[j[i]] = dic1[now1] + str(i)
                 last1[j[i]] = now1
                 q1.put(j[i])
-                &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; j[i] &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; dic2 &lt;span class=&#34;keyword&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(dic1[j[i]] + dic2[j[i]]) % &lt;span class=&#34;number&#34;&gt;8&lt;/span&gt; == &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;:
-                    &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(dic1[j[i]], dic2[j[i]])
+                if j[i] in dic2 and len(dic1[j[i]] + dic2[j[i]]) % 8 == 0:
+                    print(dic1[j[i]], dic2[j[i]])
 
-        ker = E2(&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;).division_points(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;:]
-        j = [E2.isogeny(k).codomain().j_invariant() &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; k &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; ker]
-        &lt;span class=&#34;comment&#34;&gt;# print(j)&lt;/span&gt;
-        &lt;span class=&#34;comment&#34;&gt;# print(last[now2])&lt;/span&gt;
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; last2[now2]:
+        ker = E2(0).division_points(2)[1:]
+        j = [E2.isogeny(k).codomain().j_invariant() for k in ker]
+        # print(j)
+        # print(last[now2])
+        if last2[now2]:
             j.remove(last2[now2])
-        &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;range&lt;/span&gt;(&lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(j)):
-            &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; j[i] &lt;span class=&#34;keyword&#34;&gt;not&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; dic2:
-                dic2[j[i]] = dic2[now2] + &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;(i)
+        for i in range(len(j)):
+            if j[i] not in dic2:
+                dic2[j[i]] = dic2[now2] + str(i)
                 last2[j[i]] = now2
                 q2.put(j[i])
 
-                &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; j[i] &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; dic1 &lt;span class=&#34;keyword&#34;&gt;and&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(dic1[j[i]] + dic2[j[i]]) % &lt;span class=&#34;number&#34;&gt;8&lt;/span&gt; == &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;:
-                    &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(dic1[j[i]], dic2[j[i]])
+                if j[i] in dic1 and len(dic1[j[i]] + dic2[j[i]]) % 8 == 0:
+                    print(dic1[j[i]], dic2[j[i]])
         now1, now2 = q1.get(), q2.get()
         E1 = EllipticCurve(j=now1)
         E2 = EllipticCurve(j=now2)
 
 
-&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;get_ans&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;command: &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;, a1: &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;, code: &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;, a2: &lt;span class=&#34;built_in&#34;&gt;str&lt;/span&gt;&lt;/span&gt;) -&amp;gt; &lt;span class=&#34;built_in&#34;&gt;bytes&lt;/span&gt;:
+def get_ans(command: bytes, a1: str, code: bytes, a2: str) -&amp;gt; bytes:
     command_bits = bytes_to_bits(command)
     code_bits = bytes_to_bits(code)
-    n = &lt;span class=&#34;built_in&#34;&gt;len&lt;/span&gt;(a2)
+    n = len(a2)
     j1, l1 = ihash_bits(command_bits + a1)
     j2, l2 = ihash_bits(code_bits)
     j2s = []
 
-    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;range&lt;/span&gt;(n):
+    for i in range(n):
         j2s.append(j2)
         tmp = j2
         j2 = hash_step(j2, a2[i], l2)
         l2 = tmp
-    &lt;span class=&#34;keyword&#34;&gt;assert&lt;/span&gt; j1 == j2
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; l1 == l2:
-        &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;string&#34;&gt;b&amp;quot;\xff&amp;quot;&lt;/span&gt;
+    assert j1 == j2
+    if l1 == l2:
+        return b&amp;quot;\xff&amp;quot;
     ans = command_bits + a1
-    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;range&lt;/span&gt;(n - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;, -&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;, -&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;):
-        tmp = hash_step(j1, &lt;span class=&#34;string&#34;&gt;&amp;quot;0&amp;quot;&lt;/span&gt;, l1)
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; tmp == j2s.pop():
+    for i in range(n - 1, -1, -1):
+        tmp = hash_step(j1, &amp;quot;0&amp;quot;, l1)
+        if tmp == j2s.pop():
             l1 = j1
             j1 = tmp
-            ans += &lt;span class=&#34;string&#34;&gt;&amp;quot;0&amp;quot;&lt;/span&gt;
-        &lt;span class=&#34;keyword&#34;&gt;else&lt;/span&gt;:
-            tmp = hash_step(j1, &lt;span class=&#34;string&#34;&gt;&amp;quot;1&amp;quot;&lt;/span&gt;, l1)
+            ans += &amp;quot;0&amp;quot;
+        else:
+            tmp = hash_step(j1, &amp;quot;1&amp;quot;, l1)
             l1 = j1
             j1 = tmp
-            ans += &lt;span class=&#34;string&#34;&gt;&amp;quot;1&amp;quot;&lt;/span&gt;
-        &lt;span class=&#34;comment&#34;&gt;# print(ans)&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;assert&lt;/span&gt; ihash_bits(ans)[&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;] == ihash_bits(code_bits)[&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;]
-    &lt;span class=&#34;comment&#34;&gt;# print(ihash_bits(ans)[0])&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; long_to_bytes(&lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(ans, &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;))&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;hash_1, l1 = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;print(&amp;#x27;Welcome 2 n1junior&amp;quot;&lt;/span&gt;)
-hash_2, l2 = ihash(&lt;span class=&#34;string&#34;&gt;b&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;cat /FLAG &amp;quot;&lt;/span&gt;)
-search(hash_2,hash_1,l2,l1)&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;command = &lt;span class=&#34;string&#34;&gt;b&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;cat /FLAG &amp;quot;&lt;/span&gt;
-code = &lt;span class=&#34;string&#34;&gt;b&amp;quot;print(&amp;#x27;Welcome 2 n1junior&amp;quot;&lt;/span&gt;
+            ans += &amp;quot;1&amp;quot;
+        # print(ans)
+    assert ihash_bits(ans)[0] == ihash_bits(code_bits)[0]
+    # print(ihash_bits(ans)[0])
+    return long_to_bytes(int(ans, 2))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;hash_1, l1 = ihash(b&amp;quot;print(&amp;#39;Welcome 2 n1junior&amp;quot;)
+hash_2, l2 = ihash(b&amp;quot;__import__(&amp;#39;os&amp;#39;).system(&amp;#39;cat /FLAG &amp;quot;)
+search(hash_2,hash_1,l2,l1)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;command = b&amp;quot;__import__(&amp;#39;os&amp;#39;).system(&amp;#39;cat /FLAG &amp;quot;
+code = b&amp;quot;print(&amp;#39;Welcome 2 n1junior&amp;quot;
 command_bits = bytes_to_bits(command)
 code_bits = bytes_to_bits(code)
-&lt;span class=&#34;comment&#34;&gt;# 上一段代码的输出&lt;/span&gt;
-lis = &lt;span class=&#34;string&#34;&gt;&amp;quot;&amp;quot;&amp;quot;......&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;.split(&lt;span class=&#34;string&#34;&gt;&amp;quot;\n&amp;quot;&lt;/span&gt;)
+# 上一段代码的输出
+lis = &amp;quot;&amp;quot;&amp;quot;......&amp;quot;&amp;quot;&amp;quot;.split(&amp;quot;\n&amp;quot;)
 
-&lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; line &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; lis:
-    &lt;span class=&#34;comment&#34;&gt;# print(a1, a2)&lt;/span&gt;
+for line in lis:
+    # print(a1, a2)
     a1, a2 = line.split()
     m = get_ans(command, a1, code, a2)
-    f1 = &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; m:
-        &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; i &amp;gt;= &lt;span class=&#34;number&#34;&gt;128&lt;/span&gt;:
-            f1 = &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;
-            &lt;span class=&#34;keyword&#34;&gt;break&lt;/span&gt;
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;not&lt;/span&gt; f1:
-        &lt;span class=&#34;keyword&#34;&gt;continue&lt;/span&gt;
-    &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(m, ihash(m)[&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;])&lt;/code&gt;&lt;/pre&gt;
+    f1 = 1
+    for i in m:
+        if i &amp;gt;= 128:
+            f1 = 0
+            break
+    if not f1:
+        continue
+    print(m, ihash(m)[1])
+&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;from pwn import *
 
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;&lt;span class=&#34;keyword&#34;&gt;from&lt;/span&gt; pwn &lt;span class=&#34;keyword&#34;&gt;import&lt;/span&gt; *
-
-IP, PORT = &lt;span class=&#34;string&#34;&gt;&amp;quot;101.34.72.206 1339&amp;quot;&lt;/span&gt;.split()
+IP, PORT = &amp;quot;101.34.72.206 1339&amp;quot;.split()
 conn = remote(IP, PORT)
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(conn.recvuntil(&lt;span class=&#34;string&#34;&gt;b&amp;quot;&amp;gt;&amp;gt;&amp;gt; &amp;quot;&lt;/span&gt;))
+print(conn.recvuntil(b&amp;quot;&amp;gt;&amp;gt;&amp;gt; &amp;quot;))
 
-conn.sendline(&lt;span class=&#34;string&#34;&gt;b&amp;quot;__import__(&amp;#x27;os&amp;#x27;).system(&amp;#x27;cat /FLAG \x16;B!C&amp;#x27;)&amp;quot;&lt;/span&gt;)
+conn.sendline(b&amp;quot;__import__(&amp;#39;os&amp;#39;).system(&amp;#39;cat /FLAG \x16;B!C&amp;#39;)&amp;quot;)
 
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(conn.recv())
-conn.close()&lt;/code&gt;&lt;/pre&gt;
+print(conn.recv())
+conn.close()
+&lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;Junior-RSA&#34;&gt;&lt;a href=&#34;#Junior-RSA&#34; class=&#34;headerlink&#34; title=&#34;Junior_RSA&#34;&gt;&lt;/a&gt;Junior_RSA&lt;/h2&gt;&lt;p&gt;我们可以把p，q看成$BASE &amp;#x3D; 2^{256}$进制数，那么$p &amp;#x3D; \overline{\text{abc}},q &amp;#x3D; \overline{\text{cab}}$&lt;/p&gt;
 &lt;p&gt;条件就转化为了 $n &amp;#x3D; \overline{\text{abc}}\cdot \overline{\text{cab}}，e&amp;#x3D;65537abc$&lt;/p&gt;
 &lt;p&gt;我们可以先把$abc$求解出来&lt;/p&gt;
@@ -277,74 +278,72 @@ conn.close()&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;接着就能发现我们手头有$abc,bc%BASE$，然后a又是比BASE小的,考虑在Zmod(BASE)环中的除法就可以求出a&lt;/p&gt;
 &lt;p&gt;考虑为$pq$的低位，再来考虑高位，也能看出$pq$的高位主要由ac决定&lt;/p&gt;
 &lt;p&gt;$pq&amp;#x2F;&amp;#x2F;BASE ^ 5 &amp;#x3D; ac &amp;#x2F;&amp;#x2F; BASE \ \ \ (+1)$ 注意可能有进位，a有了,c的大小也能估计出来，这以后就水到渠成了&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;&lt;span class=&#34;comment&#34;&gt;# sage&lt;/span&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;# sage
 
-&lt;span class=&#34;keyword&#34;&gt;from&lt;/span&gt; Crypto.Util.number &lt;span class=&#34;keyword&#34;&gt;import&lt;/span&gt; *
+from Crypto.Util.number import *
 
-n = &lt;span class=&#34;number&#34;&gt;1224562468550864572988516321107388462006452125881847529675226398144888628055678744854491489016309262856785169494723943649344959507818155642772331582922466943539371681776924160647697558836379614689120727659593775446187326222964118917872973684996317614900715927751822277949264379149585370840318817143291878609357893969588131470982041272505875501444442064552286330626234504767040724907034678080283717062342383737341651784574675215207283219694413200065153603535550259&lt;/span&gt;
-e = &lt;span class=&#34;number&#34;&gt;47356701171507751941853094934330097161634963503549196148254287987823089762869775349307331223083118848869825102126184149696632299476124764277876323238594318983922914255635452587035212905468593961720866809724369270149104325019013500377581&lt;/span&gt;
-enc = &lt;span class=&#34;number&#34;&gt;307839781648837102719329833689146078918113606357673952357833605392673923316706392387378621203382529480917019155723632239435123748698548640308486267420983085309284306889248702165586731118889200017606360233948688879034822132551452439147516062116990766999765714755923073387252339782026780490661436777023426366620269445376047876173655782230659201893151372247389482285331969025687842851498151565880029377050013378302485301558801016888957357366922840214729734193614497&lt;/span&gt;
+n = 1224562468550864572988516321107388462006452125881847529675226398144888628055678744854491489016309262856785169494723943649344959507818155642772331582922466943539371681776924160647697558836379614689120727659593775446187326222964118917872973684996317614900715927751822277949264379149585370840318817143291878609357893969588131470982041272505875501444442064552286330626234504767040724907034678080283717062342383737341651784574675215207283219694413200065153603535550259
+e = 47356701171507751941853094934330097161634963503549196148254287987823089762869775349307331223083118848869825102126184149696632299476124764277876323238594318983922914255635452587035212905468593961720866809724369270149104325019013500377581
+enc = 307839781648837102719329833689146078918113606357673952357833605392673923316706392387378621203382529480917019155723632239435123748698548640308486267420983085309284306889248702165586731118889200017606360233948688879034822132551452439147516062116990766999765714755923073387252339782026780490661436777023426366620269445376047876173655782230659201893151372247389482285331969025687842851498151565880029377050013378302485301558801016888957357366922840214729734193614497
 
-abc = e / &lt;span class=&#34;number&#34;&gt;65537&lt;/span&gt;
-BASE = &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; ^ &lt;span class=&#34;number&#34;&gt;256&lt;/span&gt;
+abc = e / 65537
+BASE = 2 ^ 256
 bc_low = n % BASE
 abc_low = abc % BASE
 
 a = Zmod(BASE)(abc_low / bc_low).lift()
 bc = abc / a
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(bc)
-ac_high = n // BASE ^ &lt;span class=&#34;number&#34;&gt;5&lt;/span&gt; - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(a)
+print(bc)
+ac_high = n // BASE ^ 5 - 1
+print(a)
 ac_appro = ac_high * BASE
 c_appro = ac_appro // a
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(ac_appro)
-&lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; i &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;built_in&#34;&gt;range&lt;/span&gt;(&lt;span class=&#34;number&#34;&gt;20&lt;/span&gt;):
+print(ac_appro)
+for i in range(20):
     c = c_appro + i
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; bc % c == &lt;span class=&#34;number&#34;&gt;0&lt;/span&gt;:
-        &lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(c)
-        &lt;span class=&#34;keyword&#34;&gt;break&lt;/span&gt;
+    if bc % c == 0:
+        print(c)
+        break
 b = bc / c
-bits = &lt;span class=&#34;number&#34;&gt;256&lt;/span&gt;
-p = (a &amp;lt;&amp;lt; (&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; * bits)) + (b &amp;lt;&amp;lt; bits) + c
-q = (c &amp;lt;&amp;lt; (&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; * bits)) + (a &amp;lt;&amp;lt; bits) + b
-phi = (p - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;) * (q - &lt;span class=&#34;number&#34;&gt;1&lt;/span&gt;)
-d = Zmod(phi)(&lt;span class=&#34;number&#34;&gt;1&lt;/span&gt; / e).lift()
-m = &lt;span class=&#34;built_in&#34;&gt;pow&lt;/span&gt;(enc, d, n)
+bits = 256
+p = (a &amp;lt;&amp;lt; (2 * bits)) + (b &amp;lt;&amp;lt; bits) + c
+q = (c &amp;lt;&amp;lt; (2 * bits)) + (a &amp;lt;&amp;lt; bits) + b
+phi = (p - 1) * (q - 1)
+d = Zmod(phi)(1 / e).lift()
+m = pow(enc, d, n)
 
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(long_to_bytes(m))
+print(long_to_bytes(m))
 &lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;masquerade&#34;&gt;&lt;a href=&#34;#masquerade&#34; class=&#34;headerlink&#34; title=&#34;masquerade&#34;&gt;&lt;/a&gt;masquerade&lt;/h2&gt;&lt;p&gt;核心是一个DSA的_verify，理论上一个正常的DSA的加密解密是需要对传入的消息进行hash的。但这题并没有，我们就可以进行操作。&lt;/p&gt;
 &lt;p&gt;下面是DSA的_verify函数&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;&lt;span class=&#34;keyword&#34;&gt;def&lt;/span&gt; &lt;span class=&#34;title function_&#34;&gt;_verify&lt;/span&gt;(&lt;span class=&#34;params&#34;&gt;self, m, sig&lt;/span&gt;):
-    r, s = sig
-    y, q, p, g = [self._key[comp] &lt;span class=&#34;keyword&#34;&gt;for&lt;/span&gt; comp &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; [&lt;span class=&#34;string&#34;&gt;&amp;#x27;y&amp;#x27;&lt;/span&gt;, &lt;span class=&#34;string&#34;&gt;&amp;#x27;q&amp;#x27;&lt;/span&gt;, &lt;span class=&#34;string&#34;&gt;&amp;#x27;p&amp;#x27;&lt;/span&gt;, &lt;span class=&#34;string&#34;&gt;&amp;#x27;g&amp;#x27;&lt;/span&gt;]]
-    &lt;span class=&#34;keyword&#34;&gt;if&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;not&lt;/span&gt; (&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt; &amp;lt; r &amp;lt; q) &lt;span class=&#34;keyword&#34;&gt;or&lt;/span&gt; &lt;span class=&#34;keyword&#34;&gt;not&lt;/span&gt; (&lt;span class=&#34;number&#34;&gt;0&lt;/span&gt; &amp;lt; s &amp;lt; q):
-        &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; &lt;span class=&#34;literal&#34;&gt;False&lt;/span&gt;
-    w = Integer(s).inverse(q)
-    u1 = (w * m) % q
-    u2 = (w * r) % q
-    v = (&lt;span class=&#34;built_in&#34;&gt;pow&lt;/span&gt;(g, u1, p) * &lt;span class=&#34;built_in&#34;&gt;pow&lt;/span&gt;(y, u2, p) % p) % q
-    &lt;span class=&#34;keyword&#34;&gt;return&lt;/span&gt; v == r&lt;/code&gt;&lt;/pre&gt;
-
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;    def _verify(self, m, sig):
+        r, s = sig
+        y, q, p, g = [self._key[comp] for comp in [&amp;#39;y&amp;#39;, &amp;#39;q&amp;#39;, &amp;#39;p&amp;#39;, &amp;#39;g&amp;#39;]]
+        if not (0 &amp;lt; r &amp;lt; q) or not (0 &amp;lt; s &amp;lt; q):
+            return False
+        w = Integer(s).inverse(q)
+        u1 = (w * m) % q
+        u2 = (w * r) % q
+        v = (pow(g, u1, p) * pow(y, u2, p) % p) % q
+        return v == r
+&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;题目只要求了$m % p \neq 0$ 但是我们注意到m在这个函数里面实际上是要%q的，那我们很自然的想着去构造一个m’包含m且$m’%q &amp;#x3D; 0$，我们可以令$m’ &amp;#x3D; x*2^t + m$ ,t为足够大的数，我们在Zmod(q)环中进行运算可以很简单求出$x$。&lt;/p&gt;
 &lt;p&gt;此时我们要验证的式子就转化为了$y^{\frac{w}{r}}(mod\ p)(mod\ q)&amp;#x3D;&amp;#x3D;r(mod\ p)(mod\ q)$&lt;/p&gt;
 &lt;p&gt;很容易看出来只要取$w &amp;#x3D; r &amp;#x3D; y (mod\ p)$就行了&lt;/p&gt;
 &lt;p&gt;下面是代码（交互逻辑简单，我是手工交互的）&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;highlight python&#34;&gt;q = &lt;span class=&#34;number&#34;&gt;942524496426357218162327487851802980085768486497&lt;/span&gt;
-y = &lt;span class=&#34;number&#34;&gt;66387746127247930006238071513602067820016919918456147093444250185366572831617643690749527279749659201870282909517421483664282500173244835006656966948266787290969611290478400099615021618573821177508224759028195617700527955339975301182477823908151327954312496723864732200900130492625137758191612756872294978335&lt;/span&gt;
-m = &lt;span class=&#34;string&#34;&gt;b&amp;quot; ID: @hash_hash &amp;amp; NOTE: L@zy M@n :)&amp;quot;&lt;/span&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;q = 942524496426357218162327487851802980085768486497
+y = 66387746127247930006238071513602067820016919918456147093444250185366572831617643690749527279749659201870282909517421483664282500173244835006656966948266787290969611290478400099615021618573821177508224759028195617700527955339975301182477823908151327954312496723864732200900130492625137758191612756872294978335
+m = b&amp;quot; ID: @hash_hash &amp;amp; NOTE: L@zy M@n :)&amp;quot;
 
 m = bytes_to_long(m)
 
-x = (-m * inverse(&lt;span class=&#34;number&#34;&gt;2&lt;/span&gt; ** &lt;span class=&#34;number&#34;&gt;280&lt;/span&gt;, q)) % q
-ans = x * &lt;span class=&#34;number&#34;&gt;2&lt;/span&gt;**&lt;span class=&#34;number&#34;&gt;280&lt;/span&gt; + m
-input_str = &lt;span class=&#34;string&#34;&gt;f&amp;quot;&lt;span class=&#34;subst&#34;&gt;&amp;#123;y%q&amp;#125;&lt;/span&gt;,&lt;span class=&#34;subst&#34;&gt;&amp;#123;y%q&amp;#125;&lt;/span&gt;,&lt;span class=&#34;subst&#34;&gt;&amp;#123;ans&amp;#125;&lt;/span&gt;&amp;quot;&lt;/span&gt;
-&lt;span class=&#34;keyword&#34;&gt;assert&lt;/span&gt; Auth_Code &lt;span class=&#34;keyword&#34;&gt;in&lt;/span&gt; long_to_bytes(ans) &lt;span class=&#34;keyword&#34;&gt;and&lt;/span&gt; ans % &lt;span class=&#34;built_in&#34;&gt;int&lt;/span&gt;(Ticket_Office._key[&lt;span class=&#34;string&#34;&gt;&amp;quot;p&amp;quot;&lt;/span&gt;])
+x = (-m * inverse(2 ** 280, q)) % q
+ans = x * 2**280 + m
+input_str = f&amp;quot;&amp;#123;y%q&amp;#125;,&amp;#123;y%q&amp;#125;,&amp;#123;ans&amp;#125;&amp;quot;
+assert Auth_Code in long_to_bytes(ans) and ans % int(Ticket_Office._key[&amp;quot;p&amp;quot;])
 
-&lt;span class=&#34;built_in&#34;&gt;print&lt;/span&gt;(input_str)&lt;/code&gt;&lt;/pre&gt;
-
-
+print(input_str)
+&lt;/code&gt;&lt;/pre&gt;
  ]]></description>
         </item>
     </channel>
