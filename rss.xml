@@ -7,12 +7,10 @@
         <language>en</language>
         <pubDate>Mon, 12 Feb 2024 16:16:34 +0800</pubDate>
         <lastBuildDate>Mon, 12 Feb 2024 16:16:34 +0800</lastBuildDate>
-        <category>crypto</category>
         <item>
             <guid isPermalink="true">http://example.com/2024/02/12/please-sign-in-HKCERT-CTF/</guid>
             <title>Sign_in_Please_HKCERT_CTF</title>
             <link>http://example.com/2024/02/12/please-sign-in-HKCERT-CTF/</link>
-            <category>crypto</category>
             <pubDate>Mon, 12 Feb 2024 16:16:34 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;妄图尝试cryptohack网站的ctf题目，想要挑一道solve数最多的软柿子捏，结果发现根本没有软柿子。&lt;/p&gt;
 &lt;p&gt;&lt;a href=&#34;https://cryptohack.org/challenges/ctf-archive/&#34;&gt;Sign_in_Please&lt;/a&gt; 网站最下面那道&lt;/p&gt;
