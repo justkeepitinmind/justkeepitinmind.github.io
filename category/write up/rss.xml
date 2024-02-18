@@ -1,16 +1,226 @@
 <?xml version="1.0"?>
 <rss version="2.0">
     <channel>
-        <title>shizuku&#39;s home • Posts by &#34;crypto&#34; category</title>
+        <title>shizuku&#39;s home • Posts by &#34;write up&#34; category</title>
         <link>http://example.com</link>
         <description></description>
         <language>en</language>
-        <pubDate>Sat, 10 Feb 2024 11:39:08 +0800</pubDate>
-        <lastBuildDate>Sat, 10 Feb 2024 11:39:08 +0800</lastBuildDate>
+        <pubDate>Sun, 18 Feb 2024 19:50:01 +0800</pubDate>
+        <lastBuildDate>Sun, 18 Feb 2024 19:50:01 +0800</lastBuildDate>
+        <category>crypto</category>
+        <item>
+            <guid isPermalink="true">http://example.com/2024/02/18/vnctf2023/</guid>
+            <title>vnctf2023</title>
+            <link>http://example.com/2024/02/18/vnctf2023/</link>
+            <category>crypto</category>
+            <pubDate>Sun, 18 Feb 2024 19:50:01 +0800</pubDate>
+            <description><![CDATA[ &lt;h2 id=&#34;basiccry&#34;&gt;&lt;a href=&#34;#basiccry&#34; class=&#34;headerlink&#34; title=&#34;basiccry&#34;&gt;&lt;/a&gt;basiccry&lt;/h2&gt;&lt;h3 id=&#34;题意&#34;&gt;&lt;a href=&#34;#题意&#34; class=&#34;headerlink&#34; title=&#34;题意&#34;&gt;&lt;/a&gt;题意&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;import random 
+from Crypto.Util.number import *
+flag = b&amp;#39;********************************&amp;#39;
+m = bytes_to_long(flag)
+
+rr = matrix(ZZ,[random_vector(ZZ,256,0,2) for _ in range(256)])
+mm = matrix(GF(2),[list(bin(m)[2:].rjust(256,&amp;#39;0&amp;#39;))]*256)
+cc = mm+rr
+ii = vector(ZZ,input(&amp;quot;Undoubtedly, this is a backdoor left for you: &amp;quot;).split(&amp;quot;,&amp;quot;))
+dd = rr*ii
+
+print(cc)
+print(dd)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;$rr$和$mm$都是{0，1}数组,$cc&amp;#x3D;rr\oplus mm$&lt;/p&gt;
+&lt;p&gt;$ii$是你输入的一维数组，输出$rr*ii$&lt;/p&gt;
+&lt;h3 id=&#34;分析&#34;&gt;&lt;a href=&#34;#分析&#34; class=&#34;headerlink&#34; title=&#34;分析&#34;&gt;&lt;/a&gt;分析&lt;/h3&gt;&lt;p&gt;很容易把这个联系到backpack问题，还是让我们构造backpack。&lt;/p&gt;
+&lt;p&gt;那我们可以构造很特殊的backpack&lt;/p&gt;
+&lt;p&gt;$ii&amp;#x3D;[1,2,4,8,…..]$&lt;/p&gt;
+&lt;p&gt;那么就有$rr$了，有$rr$之后$mm$也就出来了。&lt;/p&gt;
+&lt;h3 id=&#34;exp&#34;&gt;&lt;a href=&#34;#exp&#34; class=&#34;headerlink&#34; title=&#34;exp&#34;&gt;&lt;/a&gt;exp&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;from pwn import *
+
+s = 0
+a = []
+# 这儿是将思路中构造的数组reverse了，本质一样
+# 这样后续操作简单一点
+for i in range(256):
+    a.append(1 &amp;lt;&amp;lt; (255 - i))
+o = &amp;quot;,&amp;quot;.join(map(str, a))
+
+IP, PORT = &amp;quot;manqiu.top 20765&amp;quot;.split()
+conn = remote(IP, PORT)
+print(conn.recvuntil(b&amp;quot;r left for you: &amp;quot;))
+conn.sendline(o.encode())
+print(conn.recvline().decode())
+
+for i in range(255):
+    conn.recvline().decode()
+print(conn.recvline().decode())
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;将输出的$cc$第一行，和与之对应$rr*ii$的第一个答案拿出来。其实哪一行都一样，对应好就行&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;from Crypto.Util.number import *
+
+a = &amp;quot;1 1 0 0 .....&amp;quot;
+a = a.replace(&amp;quot; &amp;quot;, &amp;quot;&amp;quot;)
+a = int(a, 2)
+m = ....
+
+print(long_to_bytes(m ^ a))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;basiclog&#34;&gt;&lt;a href=&#34;#basiclog&#34; class=&#34;headerlink&#34; title=&#34;basiclog&#34;&gt;&lt;/a&gt;basiclog&lt;/h2&gt;&lt;h3 id=&#34;题意-1&#34;&gt;&lt;a href=&#34;#题意-1&#34; class=&#34;headerlink&#34; title=&#34;题意&#34;&gt;&lt;/a&gt;题意&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;q = 11769445852166501942131444325164359907623906505859865854871085543754710159882777389890225783970170353153967463136054852998337865848469266919651006863215539
+p = 23538891704333003884262888650328719815247813011719731709742171087509420319765554779780451567940340706307934926272109705996675731696938533839302013726431079
+g = 2
+y = pow(g,pow(g,x,p),q)
+print(y)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;求 x &lt;/p&gt;
+&lt;h3 id=&#34;分析-1&#34;&gt;&lt;a href=&#34;#分析-1&#34; class=&#34;headerlink&#34; title=&#34;分析&#34;&gt;&lt;/a&gt;分析&lt;/h3&gt;&lt;p&gt;也就是$2^{2^x\ mod\ p}&amp;#x3D;y\ mol\ q$&lt;/p&gt;
+&lt;p&gt;首先注意$\phi(q) &amp;#x3D; 2*p$&lt;/p&gt;
+&lt;p&gt;然后就猜测&lt;strong&gt;指数处对p取模不影响结果&lt;/strong&gt;，多选取几个x发现确实成立。&lt;/p&gt;
+&lt;p&gt;于是虽然距离证明差简单一步，但这个结论我就直接拿来用了。&lt;/p&gt;
+&lt;p&gt;猜测此处需要平方处理&lt;/p&gt;
+&lt;p&gt;$$y^2 &amp;#x3D; (2^{2^{x}})^2 &amp;#x3D; 2^{2^{x}*2} &amp;#x3D; 2^{2^{x+1}} $$&lt;/p&gt;
+&lt;p&gt;为方便叙述，我们设$y &amp;#x3D; f(x)$, $x &amp;#x3D; f^{-1}(y)$&lt;/p&gt;
+&lt;p&gt;由上面的式子我们就知道&lt;/p&gt;
+&lt;p&gt;$$f^{-1}(y) &amp;#x3D; f^{-1}(y^2)-1$$&lt;/p&gt;
+&lt;p&gt;然后这是可以一直迭代下去的&lt;/p&gt;
+&lt;p&gt;$$f^{-1}(y) &amp;#x3D; f^{-1}(y^2)-1&amp;#x3D;f^{-1}(y^4)-2&amp;#x3D;f^{-1}(y^8)-3&amp;#x3D;….$$&lt;/p&gt;
+&lt;p&gt;一直写下去什么时候结束呢。我们可以先打弄一个字典dic来打表，当y的值出现在表中的时候就结束，然后就能得到x&lt;/p&gt;
+&lt;p&gt;$x$是48bit的，那我们可以先均匀打$2^{24}$个点，然后那么y就大约需要迭代$2^{24}$次就可以出答案&lt;/p&gt;
+&lt;h3 id=&#34;exp-1&#34;&gt;&lt;a href=&#34;#exp-1&#34; class=&#34;headerlink&#34; title=&#34;exp&#34;&gt;&lt;/a&gt;exp&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;dic = &amp;#123;&amp;#125;
+
+# 按照上面的思路应该是N1 = N2 = 2**24，但是实际
+# 操作下来打表建立字典很慢，而其实迭代的过程相对
+# 较快，于是就调整了N1，N2的大小，最后3min跑完。
+
+N1 = 2**19 
+N2 = 2**29
+g1 = pow(g, N2, q)
+print(q.bit_length())
+print(p.bit_length())
+for i in range(N1 - N1 // 1, N1):
+    if i % (2**16) == 0:
+        print(i)
+
+    tmp1 = pow(g1, i, q)
+    y = pow(g, tmp1, p)
+    dic[y] = i * N2
+
+def brute(y: int):
+    for i in range(N2):
+        if y in dic:
+            x = dic[y] - i
+            break
+        y = (y * y) % p
+    else:
+        x = 0
+        print(&amp;quot;not found&amp;quot;)
+    print(x)
+
+y =  ...
+
+print(brute(y))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;sign-ahead&#34;&gt;&lt;a href=&#34;#sign-ahead&#34; class=&#34;headerlink&#34; title=&#34;sign_ahead&#34;&gt;&lt;/a&gt;sign_ahead&lt;/h2&gt;&lt;h3 id=&#34;题意-2&#34;&gt;&lt;a href=&#34;#题意-2&#34; class=&#34;headerlink&#34; title=&#34;题意&#34;&gt;&lt;/a&gt;题意&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;key = token_bytes(32)
+
+msg = token_bytes(64)
+
+sign = md5(key + msg).hexdigest()
+
+print(&amp;#39;msg:&amp;#39;, msg.hex())
+print(&amp;#39;sign:&amp;#39;, sign)
+
+print(&amp;#39;FORGE ME!!!!&amp;#39;)
+    
+newmsg = bytes.fromhex(input(&amp;#39;msg: &amp;#39;))
+newsign = input(&amp;#39;sign: &amp;#39;).strip()
+
+assert msg != newmsg
+
+if md5(key + newmsg).hexdigest() == newsign:
+    print(&amp;#39;GREAT JOB&amp;#39;)
+    successful_forge += 1
+    
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;已知msg和md5(key+msg)，任意找一个newmsg和其对应的md5(key+newmsg)&lt;/p&gt;
+&lt;h3 id=&#34;分析-2&#34;&gt;&lt;a href=&#34;#分析-2&#34; class=&#34;headerlink&#34; title=&#34;分析&#34;&gt;&lt;/a&gt;分析&lt;/h3&gt;&lt;p&gt;&lt;a href=&#34;https://hackmd.io/@amyriad/hkcert-signin&#34;&gt;Sign in Please&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;前不久做的某题的题解，看懂那题的思路就可以直接拿来套这题，那题当时的加密是sha256,本题是md5，但本质是一样的。&lt;/p&gt;
+&lt;p&gt;首先要去找md5的py实现&lt;a href=&#34;https://github.com/acmeism/RosettaCodeData/blob/ed705008a8d39177a7cc5a047705a2e3700b6c2b/Task/MD5-Implementation/Python/md5-implementation.py#L8&#34;&gt;md5-implementation.py&lt;/a&gt;，然后和那题一样稍微修改一下，修改其中的my_md5函数，增加pads&amp;#x3D;False的选择和hash初始值的设置&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;def md5(message,pads = True,hash_pieces = None):
+ 
+    message = bytearray(message) #copy our input into a mutable buffer
+    orig_len_in_bits = (8 * len(message)) &amp;amp; 0xffffffffffffffff
+    if pads:
+        message.append(0x80)
+        while len(message)%64 != 56:
+            message.append(0)
+        message += orig_len_in_bits.to_bytes(8, byteorder=&amp;#39;little&amp;#39;)
+    else:
+        while len(message)%64 != 0:
+            message.append(0)
+    if hash_pieces == None:
+        hash_pieces = init_values[:]
+    ...
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;然后其实基本已经出了，细节见下文注释&lt;/p&gt;
+&lt;h3 id=&#34;exp-2&#34;&gt;&lt;a href=&#34;#exp-2&#34; class=&#34;headerlink&#34; title=&#34;exp&#34;&gt;&lt;/a&gt;exp&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;
+
+def to_hash_array(m:str)-&amp;gt;list:
+    arr = [bytes.fromhex(m[i:i+8]) for i in range(0,len(m),8)]
+    return list(map(lambda x:int.from_bytes(x, byteorder=&amp;#39;little&amp;#39;),arr))
+
+def attack_md5(msg:str,sign):
+    key = b&amp;#39;\0&amp;#39;*32
+    msg = bytes.fromhex(msg)
+    hash = to_hash_array(sign)
+    
+    length1 = 96
+    orig_len_in_bits = (8 * length1) &amp;amp; 0xffffffffffffffff
+    message = bytearray(key + msg)
+    message.append(0x80)
+    while len(message)%64 != 56:
+        message.append(0)
+    message += orig_len_in_bits.to_bytes(8, byteorder=&amp;#39;little&amp;#39;)
+    new_msg = bytes(message)[32:]
+    # key + new_msg其实就是key + msg经过pad的结果
+
+    # key + new_msg仍然需要经过pad。他有三个chunk。
+    # 前两个chunk和key+msg的chunk一样，所以经过前两
+    # 轮循环的hash_pieces其实就是sign。所以我们只需
+    # 要对第三个chunk进行一轮循环就行，这里我将第三轮
+    # chunk的内容放在message中，然后走一轮不要循环就
+    # 行了。
+    length1 = 128
+    orig_len_in_bits = (8 * length1) &amp;amp; 0xffffffffffffffff
+    message = bytearray(b&amp;quot;&amp;quot;)
+    message.append(0x80)
+    while len(message)%64 != 56:
+        message.append(0)
+    message += orig_len_in_bits.to_bytes(8, byteorder=&amp;#39;little&amp;#39;)
+    # print(message)
+    new_sign = md5_to_hex(md5(bytes(message),False,hash))
+    return new_msg.hex(),new_sign
+
+# 这个有个坑是pwn和我找的md5函数里面都定义了constants
+# 变量，直接import * 会有问题
+from pwn import remote
+IP,PORT = &amp;quot;manqiu.top:21072&amp;quot;.split(&amp;quot;:&amp;quot;)
+conn = remote(IP, PORT)
+for i in range(100):
+    conn.recvuntil(&amp;quot;msg:&amp;quot;)
+    msg = conn.recvline().decode().strip()
+    conn.recvuntil(&amp;quot;sign:&amp;quot;)
+    sign = conn.recvline().decode().strip()
+    new_msg,new_sign = attack_md5(msg,sign)
+    conn.sendlineafter(&amp;quot;msg: &amp;quot;,new_msg.encode())
+    conn.sendlineafter(&amp;quot;sign: &amp;quot;,new_sign.encode())
+    print(conn.recvline())
+print(conn.recvline())
+&lt;/code&gt;&lt;/pre&gt;
+ ]]></description>
+        </item>
         <item>
             <guid isPermalink="true">http://example.com/2024/02/10/n1junoir/</guid>
             <title>n1junoir write up</title>
             <link>http://example.com/2024/02/10/n1junoir/</link>
+            <category>crypto</category>
             <pubDate>Sat, 10 Feb 2024 11:39:08 +0800</pubDate>
             <description><![CDATA[ &lt;h2 id=&#34;introduction&#34;&gt;&lt;a href=&#34;#introduction&#34; class=&#34;headerlink&#34; title=&#34;introduction&#34;&gt;&lt;/a&gt;introduction&lt;/h2&gt;&lt;p&gt;n1 junior crypto方向总的来说题是不难，有新意。本人也有幸拿下两个一血。&lt;/p&gt;
 &lt;p&gt;这篇文章是我的第一篇wp，也是发在博客上的第一篇文章，就当练练手吧&lt;/p&gt;
