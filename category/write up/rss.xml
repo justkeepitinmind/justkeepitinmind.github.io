@@ -15,7 +15,7 @@
             <category>crypto</category>
             <pubDate>Sun, 18 Feb 2024 19:50:01 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;总的来说，basiccry是不难的，sign_ahead是比较套路化的，basiclog有点意思。&lt;br&gt;sign_in是没时间看而且看不懂的。&lt;/p&gt;
-&lt;!---more---&gt;
+&lt;span id=&#34;more&#34;&gt;&lt;/span&gt;
 &lt;h2 id=&#34;basiccry&#34;&gt;&lt;a href=&#34;#basiccry&#34; class=&#34;headerlink&#34; title=&#34;basiccry&#34;&gt;&lt;/a&gt;basiccry&lt;/h2&gt;&lt;h3 id=&#34;题意&#34;&gt;&lt;a href=&#34;#题意&#34; class=&#34;headerlink&#34; title=&#34;题意&#34;&gt;&lt;/a&gt;题意&lt;/h3&gt;&lt;pre&gt;&lt;code class=&#34;python&#34;&gt;import random 
 from Crypto.Util.number import *
 flag = b&amp;#39;********************************&amp;#39;
